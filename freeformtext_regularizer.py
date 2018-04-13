@@ -62,6 +62,11 @@ def main():
   freeform_labels = extract_and_parse_csv(args.input_csv, args.key_header_label,
                                           args.values_header_label)
   print(freeform_labels)
+  # Use morphy and closure: http://www.nltk.org/howto/wordnet.html
+
+  # Use anytree: https://pypi.python.org/pypi/anytree
+
+  # anytree io: http://anytree.readthedocs.io/en/latest/exporter/jsonexporter.html
 
 
 if __name__ == "__main__":
