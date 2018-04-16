@@ -16,11 +16,11 @@ class WordNode(NodeMixin):
   """Tree node class extension."""
   generate_new_uid = itertools.count().next
   def __init__(self, name, origin_text=None, parent=None):
-  	super(WordNode, self).__init__()
-	self.name = name
-	self.origin_text = origin_text
-	self.parent = parent
-	self.uid = WordNode.generate_new_uid()
+    super(WordNode, self).__init__()
+    self.name = name
+    self.origin_text = origin_text
+    self.parent = parent
+    self.uid = WordNode.generate_new_uid()
 
 
 def _deserialize_ontologies(filename):
@@ -49,13 +49,13 @@ def _extend_ontology(descendents, node_map, parent):
   overall map of nodes.
    """
   if len(descendents) == 0:
-  	return
+    return
 
   node_text = descendents.pop()
 
   if not node_text in node_map:
-	# Create node and add it to map of all nodes.
-	node_map[node_text] = WordNode(name=node_text, parent=parent)
+    # Create node and add it to map of all nodes.
+    node_map[node_text] = WordNode(name=node_text, parent=parent)
 
   # Recurse.
   _extend_ontology(descendents, node_map, node_map[node_text])
@@ -96,4 +96,4 @@ def _serialize_ontology(root, filename=None):
   if filename:
     exporter.write(root, filename)
   else:
-  	return exporter.export(root)
+    return exporter.export(root)

@@ -53,42 +53,42 @@ def _create_ontologies(key_to_labels):
   key_to_node_uids = collections.defaultdict(list)
 
   for key, labels in key_to_labels.iteritems():
-  	for label in labels:
-  	  synsets = wordnet.synsets(label)
+    for label in labels:
+      synsets = wordnet.synsets(label)
 
-  	  # If label is not found, keep track of it and move on.
-  	  if len(synsets) == 0:
-  	  	if label in not_found:
-  	  	  not_found[label] += 1
-  	  	else:
-  	  	  not_found[label] = 1
-  	  	continue
+      # If label is not found, keep track of it and move on.
+      if len(synsets) == 0:
+        if label in not_found:
+          not_found[label] += 1
+        else:
+          not_found[label] = 1
+        continue
 
-  	  # If label is found, find its tree path.
-  	  for synset in synsets:
-  	  	leaf_text = synset.name()
+      # If label is found, find its tree path.
+      for synset in synsets:
+        leaf_text = synset.name()
 
-  	  	# If leaf does not exist, add it and its descendents.
-  	  	if not leaf_text in node_map:
-		  # Path is returned in leaf -> root order.
-		  descendents = [d.name()
-		                 for d in synset.closure(lambda s: s.hypernyms())]
-		  wo._extend_ontology(collections.deque(descendents), node_map, None)
+        # If leaf does not exist, add it and its descendents.
+        if not leaf_text in node_map:
+          # Path is returned in leaf -> root order.
+          descendents = [d.name()
+                         for d in synset.closure(lambda s: s.hypernyms())]
+          wo._extend_ontology(collections.deque(descendents), node_map, None)
 
-		  # Finally, add the leaf node.
-		  leaf_parent = (None if len(descendents) == 0
-		  	                  else node_map[descendents[0]])
-		  node_map[leaf_text] = wo.WordNode(name=leaf_text, origin_text=label,
-		  	                                parent=leaf_parent)
+          # Finally, add the leaf node.
+          leaf_parent = (None if len(descendents) == 0
+                              else node_map[descendents[0]])
+          node_map[leaf_text] = wo.WordNode(name=leaf_text, origin_text=label,
+                                            parent=leaf_parent)
 
-		  # If we haven't seen this tree before, keep track of the root.
-		  root_node = node_map[leaf_text if len(descendents) == 0
-		                                 else descendents[-1]]
-		  if not root_node in roots:
-		  	roots.append(root_node)
+          # If we haven't seen this tree before, keep track of the root.
+          root_node = node_map[leaf_text if len(descendents) == 0
+                                         else descendents[-1]]
+          if not root_node in roots:
+            roots.append(root_node)
 
-  	  	# Associate the key to the UID of the label's synset.
-  	  	key_to_node_uids[key].append(node_map[leaf_text].uid)
+        # Associate the key to the UID of the label's synset.
+        key_to_node_uids[key].append(node_map[leaf_text].uid)
 
   return roots, key_to_node_uids, not_found
 
@@ -103,7 +103,7 @@ def _extract_and_parse_csv(input_csv, key_header_label, values_header_label):
     # Parse the header row.
     header = reader.next()
     key_idx = (None if key_header_label is None
-    	            else header.index(key_header_label))
+                  else header.index(key_header_label))
     val_idx = header.index(values_header_label)
 
     # Parse the data rows.
@@ -135,26 +135,26 @@ def _extract_and_parse_csv(input_csv, key_header_label, values_header_label):
 def parse_args():
   parser = argparse.ArgumentParser(description='Free text cleaner')
   parser.add_argument('--input_csv',
-  					  help='Path to input CSV file.',
-  	                  required=True)
+                      help='Path to input CSV file.',
+                      required=True)
   parser.add_argument('--key_header_label',
-  	 				  help='Text in column header of input CSV file denoting '
-  	 				  'column with presumably unique IDs to key the output '
-  	 				  'map. If not provided, the row number will be used '
-  	 				  'instead.',
-  	 				  default=None)
+                      help='Text in column header of input CSV file denoting '
+                      'column with presumably unique IDs to key the output '
+                      'map. If not provided, the row number will be used '
+                      'instead.',
+                      default=None)
   parser.add_argument('--values_header_label',
-  	                  help='Text in column header of input CSV file denoting '
-  	                  'column with text to regularize.',
-  	                  required=True)
+                      help='Text in column header of input CSV file denoting '
+                      'column with text to regularize.',
+                      required=True)
   parser.add_argument('--output_json_ontologies',
-  					  help='Path to output JSON file of resolved ontologies.',
-  					  required=True)
+                      help='Path to output JSON file of resolved ontologies.',
+                      required=True)
   parser.add_argument('--output_json_key_to_ontology_uid_map',
-  	                  help='Path to output JSON file of keys or unique IDs '
-  	                  'from the CSV file to the unique IDs of words in the '
-  	                  'resolved ontologies.',
-  	                  required=True)
+                      help='Path to output JSON file of keys or unique IDs '
+                      'from the CSV file to the unique IDs of words in the '
+                      'resolved ontologies.',
+                      required=True)
 
   args = parser.parse_args()
   return args
@@ -163,14 +163,14 @@ def parse_args():
 def main():
   args = parse_args()
   key_to_freeform_labels = _extract_and_parse_csv(
-  	  args.input_csv, args.key_header_label, args.values_header_label)
+      args.input_csv, args.key_header_label, args.values_header_label)
   roots, key_to_node_uids, not_found = _create_ontologies(
-  	  key_to_freeform_labels)
+      key_to_freeform_labels)
 
   print('Ontologies found:')
   for root in roots:
-  	wo._print_ontology(root)
-  	print("\n")
+    wo._print_ontology(root)
+    print("\n")
   wo._serialize_ontologies(roots, args.output_json_ontologies)
   print('Ontologies written to %s' % args.output_json_ontologies)
 
@@ -179,10 +179,10 @@ def main():
 
   with open(args.output_json_key_to_ontology_uid_map, 'w') as f:
     json.dump(dict(key_to_node_uids), f,
-    	      args.output_json_key_to_ontology_uid_map, indent=2,
-    	      sort_keys=True)
+              args.output_json_key_to_ontology_uid_map, indent=2,
+              sort_keys=True)
   print('\nKey-to-ontology-UIDs map written to %s' %
-  	    args.output_json_key_to_ontology_uid_map)
+        args.output_json_key_to_ontology_uid_map)
 
 if __name__ == '__main__':
   main()
